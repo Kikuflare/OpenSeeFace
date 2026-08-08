@@ -2,6 +2,67 @@
 
 # Overview
 
+## Arch Linux + Lutris setup
+
+If you are running OpenSeeFace on Arch Linux and want to launch it from Lutris with VSeeFace, follow these steps.
+
+1. Create and activate the virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+If you use `fish`, activate with:
+
+```fish
+source venv/bin/activate.fish
+```
+
+2. Install the required Python packages:
+
+```bash
+python -m pip install --upgrade pip setuptools wheel
+pip install onnxruntime opencv-python pillow numpy
+```
+
+3. Verify the tracker works on its own:
+
+```bash
+python facetracker.py -c 0 -W 1280 -H 720 \
+  --discard-after 0 --scan-every 0 --no-3d-adapt 1 \
+  --max-feature-updates 900 --ip 127.0.0.1 --port 11573 -v 0
+```
+
+If the webcam light turns on and you see console output like `Confidence[0]: ...`, the tracker is running correctly.
+
+4. Use the helper scripts included in this repo:
+
+```bash
+./start_openseeface_tracker.sh
+./stop_openseeface_tracker.sh
+```
+
+These scripts start and stop the tracker cleanly for Lutris.
+
+5. In Lutris, configure the game with:
+
+- Pre-launch script: `/path/to/OpenSeeFace/start_openseeface_tracker.sh`
+- Wait for pre-launch script completion: enabled
+- Post-exit script: `/path/to/OpenSeeFace/stop_openseeface_tracker.sh`
+- Executable: `/path/to/VSeeFace.exe`
+- Arguments: leave empty
+- Runner: Wine
+
+> Note: In current Lutris versions, the pre/post script fields are only visible after toggling **Advanced** in the game configuration screen.
+
+6. In VSeeFace, set the OpenSeeFace input to:
+
+- IP: `127.0.0.1`
+- Port: `11573`
+
+# Overview
+
 **Note**: This is a tracking library, **not** a stand-alone avatar puppeteering program. I'm also working on [VSeeFace](https://www.vseeface.icu/), which allows animating [VRM](https://vrm.dev/en/how_to_make_vrm/) and [VSFAvatar](https://www.youtube.com/watch?v=jhQ8DF87I5I) 3D models by using OpenSeeFace tracking. [VTube Studio](https://denchisoft.com/) uses OpenSeeFace for webcam based tracking to animate Live2D models. A renderer for the Godot engine can be found [here](https://github.com/virtual-puppet-project/vpuppr).
 
 This project implements a facial landmark detection model based on MobileNetV3.
@@ -33,6 +94,54 @@ The provided `OpenSee` Unity component can receive these UDP packets and provide
 Run the python script with `--help` to learn about the possible options you can set.
 
     python facetracker.py --help
+
+### Arch Linux + Lutris setup
+
+If you are running OpenSeeFace on Arch Linux and want to launch it from Lutris with VSeeFace, follow these steps.
+
+1. Create and activate the virtual environment:
+
+    python3 -m venv venv
+    source venv/bin/activate
+
+   If you use `fish`, activate with:
+
+    source venv/bin/activate.fish
+
+2. Install the required Python packages:
+
+    python -m pip install --upgrade pip setuptools wheel
+    pip install onnxruntime opencv-python pillow numpy
+
+3. Verify the tracker works on its own:
+
+    python facetracker.py -c 0 -W 1280 -H 720 \
+      --discard-after 0 --scan-every 0 --no-3d-adapt 1 \
+      --max-feature-updates 900 --ip 127.0.0.1 --port 11573 -v 0
+
+   If the webcam light turns on and you see console output like `Confidence[0]: ...`, the tracker is running correctly.
+
+4. Use the helper scripts included in this repo:
+
+    ./start_openseeface_tracker.sh
+    ./stop_openseeface_tracker.sh
+
+   These scripts start and stop the tracker cleanly for Lutris.
+
+5. In Lutris, configure the game with:
+
+   - Pre-launch script: `/path/to/OpenSeeFace/start_openseeface_tracker.sh`
+   - Wait for pre-launch script completion: enabled
+   - Post-exit script: `/path/to/OpenSeeFace/stop_openseeface_tracker.sh`
+   - Executable: `/bin/bash`
+   - Arguments: `/path/to/VSeeFace.exe`
+
+6. In VSeeFace, set the OpenSeeFace input to:
+
+   - IP: `127.0.0.1`
+   - Port: `11573`
+
+7. Run VSeeFace through Lutris. The tracker should start first, then VSeeFace should connect to it.
 
 A simple demonstration can be achieved by creating a new scene in Unity, adding an empty game object and both the `OpenSee` and `OpenSeeShowPoints` components to it. While the scene is playing, run the face tracker on a video file:
 
